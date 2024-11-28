@@ -69,22 +69,22 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Email validation regex
+           
             const emailPattern = /^[\w-\.]+@@([\w-]+\.)+[\w-]{2,4}$/;
-            // Allowed image extensions
+            
             const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
 
-            // Validate email field on change
+           
             $('#Email').on('input', function () {
                 const email = $(this).val();
                 if (emailPattern.test(email)) {
-                    $('#emailError').text(''); // Clear error message if valid
+                    $('#emailError').text(''); 
                 } else {
                     $('#emailError').text('Please enter a valid email address.');
                 }
             });
 
-            // DOB validation to ensure date is in the past
+          
             $('#DOB').on('change', function () {
                 const dob = new Date($(this).val());
                 const today = new Date();
@@ -92,22 +92,22 @@
                 if (dob >= today) {
                     $('#dobError').text('Date of Birth must be in the past.');
                 } else {
-                    $('#dobError').text(''); // Clear error message if valid
+                    $('#dobError').text(''); 
                 }
             });
 
-            // Image file validation
+            
             $('#ImageFile').on('change', function () {
                 const filePath = $(this).val();
                 if (!allowedExtensions.exec(filePath)) {
                     $('#fileError').text('Only .jpg, .jpeg, and .png files are allowed.');
-                    $(this).val(''); // Clear the file input if invalid
+                    $(this).val(''); 
                 } else {
-                    $('#fileError').text(''); // Clear error message if valid
+                    $('#fileError').text(''); 
                 }
             });
 
-            // Validate form before submission
+           
             $('form').on('submit', function (e) {
                 const email = $('#Email').val();
                 const dob = new Date($('#DOB').val());
@@ -131,7 +131,7 @@
                 }
 
                 if (!isValid) {
-                    e.preventDefault(); // Prevent form submission if validation fails
+                    e.preventDefault(); 
                 }
             });
         });

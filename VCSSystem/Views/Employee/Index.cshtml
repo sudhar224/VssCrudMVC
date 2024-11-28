@@ -10,7 +10,7 @@
     @Html.AntiForgeryToken()
 
     <div class="form-horizontal">
-       
+
         <hr />
 
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -44,9 +44,13 @@
         <div class="form-group row">
             @Html.LabelFor(model => model.NewEmployee.ImageFile, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <input type="file" name="NewEmployee.ImageFile" id="ImageFile" alt="EmployeeImage" class="form-control" />
+                <input type="file" name="NewEmployee.ImageFile" id="ImageFile" alt="Employee Image" class="form-control" />
                 <span class="text-danger" id="fileError"></span>
                 @Html.ValidationMessageFor(model => model.NewEmployee.ImageFile, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mt-2">
+                <img id="imagePreview" src="#" alt="Image Preview" style="display:none; max-width: 150px; max-height: 150px; border: 1px solid #ddd; padding: 5px;" />
             </div>
         </div>
 
@@ -76,7 +80,9 @@
             <td>@item.Email</td>
             <td>@item.DOB.ToShortDateString()</td>
             <td>
-                <img src="@Url.Content(item.Photo)" alt="Employee Photo" width="80" height="80" />
+                <img src="@Url.Content(item.Photo)"
+                     onerror="this.onerror=null; this.outerHTML = '<span>' + this.alt + '</span>';"
+                     alt="No photo "  width="80" height="80" />                
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
@@ -90,22 +96,22 @@
 
     <script>
         $(document).ready(function () {
-           
+
             const emailPattern = /^[\w-\.]+@@([\w-]+\.)+[\w-]{2,4}$/;
-           
+
             const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
 
-            // Validate email field on change
+
             $('#Email').on('input', function () {
                 const email = $(this).val();
                 if (emailPattern.test(email)) {
-                    $('#emailError').text(''); // Clear error message if valid
+                    $('#emailError').text('');
                 } else {
                     $('#emailError').text('Please enter a valid email address.');
                 }
             });
 
-            // DOB validation to ensure date is in the past
+
             $('#DOB').on('change', function () {
                 const dob = new Date($(this).val());
                 const today = new Date();
@@ -113,22 +119,49 @@
                 if (dob >= today) {
                     $('#dobError').text('Date of Birth must be in the past.');
                 } else {
-                    $('#dobError').text(''); // Clear error message if valid
+                    $('#dobError').text('');
                 }
             });
 
-            // Image file validation
+
             $('#ImageFile').on('change', function () {
                 const filePath = $(this).val();
                 if (!allowedExtensions.exec(filePath)) {
                     $('#fileError').text('Only .jpg, .jpeg, and .png files are allowed.');
-                    $(this).val(''); // Clear the file input if invalid
+                    $(this).val('');
                 } else {
-                    $('#fileError').text(''); // Clear error message if valid
+                    $('#fileError').text('');
                 }
             });
 
-            // Validate form before submission
+            $('#ImageFile').on('change', function () {
+                const file = this.files[0];
+                const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+                const fileError = $('#fileError');
+                const imagePreview = $('#imagePreview');
+
+                if (file) {
+                    const filePath = $(this).val();
+                    if (!allowedExtensions.exec(filePath)) {
+                        fileError.text('Only .jpg, .jpeg, and .png files are allowed.');
+                        $(this).val('');
+                        imagePreview.hide(); // Hide the preview if invalid file
+                    } else {
+                        fileError.text('');
+
+                        // Read the file and set it to the preview img tag
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            imagePreview.attr('src', e.target.result).show();
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                } else {
+                    imagePreview.hide(); // Hide the preview if no file is selected
+                }
+            });
+
+
             $('form').on('submit', function (e) {
                 const email = $('#Email').val();
                 const dob = new Date($('#DOB').val());
@@ -152,9 +185,12 @@
                 }
 
                 if (!isValid) {
-                    e.preventDefault(); // Prevent form submission if validation fails
+                    e.preventDefault();
                 }
             });
+
+            
         });
     </script>
+   
 }
