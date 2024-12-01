@@ -64,38 +64,91 @@
 <hr />
 
 <h3>Employee List</h3>
-<table class="table">
-    <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Date of Birth</th>
-        <th>Photo</th>
-        <th>Actions</th>
-    </tr>
-
-    @foreach (var item in Model.EmployeeList)
-    {
+<table id="employeeTable" class="table">
+    <thead>
         <tr>
-            <td>@item.Name</td>
-            <td>@item.Email</td>
-            <td>@item.DOB.ToShortDateString()</td>
-            <td>
-                <img src="@Url.Content(item.Photo)"
-                     onerror="this.onerror=null; this.outerHTML = '<span>' + this.alt + '</span>';"
-                     alt="No photo "  width="80" height="80" />                
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-            </td>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Date of Birth</th>
+            <th>Photo</th>
+            <th>Actions</th>
         </tr>
-    }
+    </thead>
+    <tbody>
+        @foreach (var item in Model.EmployeeList)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Email</td>
+                <td>@item.DOB.ToShortDateString()</td>
+                <td>
+                    <img src="@Url.Content(item.Photo)"
+                         onerror="this.onerror=null; this.outerHTML = '<span>' + this.alt + '</span>';"
+                         alt="No photo " width="80" height="80" />
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
 </table>
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 
     <script>
         $(document).ready(function () {
+
+            $('#employeeTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                responsive: true,
+                pageLength:2,
+                dom: 'Bfrtip', // Add the Buttons control to the DataTable
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        title: 'Employee Data',
+                        exportOptions: {
+                            columns: ':not(:last-child)' // Exclude the Actions column
+                        },
+                        text: 'Export to Excel'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        title: 'Employee Data',
+                        exportOptions: {
+                            columns : ':not(:eq(3))'
+                        },
+                        text: 'Export to PDF'
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        title: 'Employee Data',
+                        text: 'Export to CSV'
+                    },
+                    {
+                        extend: 'print',
+                        exportOptions: {
+                            columns: ':not(:eq(3,4))'
+                        },
+                        text: 'Print'
+                    }
+                ],
+                language: {
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    paginate: {
+                        first: "First",
+                        last: "Last",
+                        next: "Next",
+                        previous: "Previous"
+                    }
+                }
+            });
 
             const emailPattern = /^[\w-\.]+@@([\w-]+\.)+[\w-]{2,4}$/;
 

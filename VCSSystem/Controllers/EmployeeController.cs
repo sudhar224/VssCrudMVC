@@ -75,30 +75,32 @@ namespace VCSSystem.Controllers
 			}
 		}
 
-		private List<Employee> GetEmployeeList()
-		{
-			List<Employee> EmployeeObj = new List<Employee>();
-			using (SqlConnection con = new SqlConnection(constr))
+			private List<Employee> GetEmployeeList()
 			{
-				con.Open();
-				SqlCommand cmd = new SqlCommand("sp_list_employee", con);
-				SqlDataReader sdr = cmd.ExecuteReader();
-				while (sdr.Read())
+				List<Employee> EmployeeObj = new List<Employee>();
+				using (SqlConnection con = new SqlConnection(constr))
 				{
-					EmployeeObj.Add(new Employee
+					con.Open();
+					SqlCommand cmd = new SqlCommand("sp_list_employee", con);
+					SqlDataReader sdr = cmd.ExecuteReader();
+					while (sdr.Read())
 					{
-						Id = Convert.ToInt32(sdr["Id"]),
-						Name = sdr["Name"].ToString(),
-						Email = sdr["Email"].ToString(),
-						DOB = Convert.ToDateTime(sdr["DOB"]),
-						Photo = sdr["Photo"].ToString()
-					});
+						EmployeeObj.Add(new Employee
+						{
+							Id = Convert.ToInt32(sdr["Id"]),
+							Name = sdr["Name"].ToString(),
+							Email = sdr["Email"].ToString(),
+							DOB = Convert.ToDateTime(sdr["DOB"]),
+							Photo = sdr["Photo"].ToString()
+						});
+					}
+					sdr.Close();
+					con.Close();
 				}
-				sdr.Close();
-				con.Close();
+				
+					return EmployeeObj;	
+			
 			}
-			return EmployeeObj;
-		}
 	
 
 	// GET: Employee/Edit/5
